@@ -7,6 +7,7 @@ import AppLayout from "./layout/AppLayout";
 import Home from "./pages/Dashboard/Home";
 import ManageSongs from "./pages/ManageSongs/ManageSongs";
 import ManageUser from "./pages/ManageUsers/ManageUser";
+import TableSongs from "./pages/ManageSongs/TableSongs";
 
 export default function App() {
   return (
@@ -19,7 +20,7 @@ export default function App() {
             {/* Others Page */}
             <Route path="/profile" element={<UserProfiles />} />
             <Route path="/manage-song" element={<ManageSongs />} />
-            <Route path="/manage-user" element={<ManageUser />} />
+            <Route path="/manage-user" element={<TableSongs />} />
           </Route>
 
           {/* Auth Layout */}
