@@ -24,9 +24,19 @@ const navItems = [
     path: "/manage-song",
   },
   {
+    icon: <CalenderIcon />,
+    name: "Table songs",
+    path: "/table-song",
+  },
+  {
     icon: <UserCircleIcon />,
     name: "User Profile",
     path: "/profile",
+  },
+  {
+    icon: <UserCircleIcon />,
+    name: "User Management",
+    path: "/manage-user",
   },
 ];
 

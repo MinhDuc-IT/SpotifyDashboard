@@ -1,8 +1,47 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { getAllSongs, deleteSong } from "../../services/songService";
+import ManageSongs from "./ManageSongs";
 
 function TableSongs() {
   const [songs, setSongs] = useState([]);
+  const [showCreateForm, setShowCreateForm] = useState(false);
+
+  useEffect(() => {
+    setSongs([
+      {
+        songID: 1,
+        songName: "Song One",
+        playCount: 150,
+        image: "https://placehold.co/100?text=Image+1",
+        audio: "https://res.cloudinary.com/dswyuiiqp/raw/upload/v1744037930/spotify_audio/rilmkaezwauamaojztxu.mp3",
+      },
+      {
+        songID: 2,
+        songName: "Song Two",
+        playCount: 98,
+        image: "https://placehold.co/100?text=Image+2",
+        audio: "https://res.cloudinary.com/dswyuiiqp/raw/upload/v1744037930/spotify_audio/rilmkaezwauamaojztxu.mp3",
+      },
+      {
+        songID: 3,
+        songName: "Song Three",
+        playCount: 210,
+        image: "https://placehold.co/100?text=Image+3",
+        audio: "https://res.cloudinary.com/dswyuiiqp/raw/upload/v1744037930/spotify_audio/rilmkaezwauamaojztxu.mp3",
+      },
+    ]);
+  }, []);
+
+  const audioRefs = useRef([]);
+
+  const handlePlay = (index) => {
+    audioRefs.current.forEach((audio, i) => {
+      if (i !== index && audio && !audio.paused) {
+        audio.pause();
+        //audio.currentTime = 0;
+      }
+    });
+  };  
 
   useEffect(() => {
     // Gọi API để lấy danh sách bài hát
@@ -37,10 +76,32 @@ function TableSongs() {
     alert(`Edit functionality for Song ID: ${songID} is not implemented yet.`);
   };
 
+  const handleCreate = () => {
+    //window.location.href='/manage-song'
+    setShowCreateForm(true);
+  };
+
   return (
     <div className="w-full">
-      <h2 className="text-lg font-semibold mb-4">Song Management</h2>
-      <table className="min-w-full border-collapse border border-gray-300 relative z-[-1]">
+      {showCreateForm && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          onClick={() => setShowCreateForm(false)}
+        >
+          <div
+            className="bg-white rounded-xl shadow-lg w-full max-w-[70vw] max-h-[95vh] overflow-y-auto p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <ManageSongs onClose={() => setShowCreateForm(false)} />
+          </div>
+        </div>
+      )}
+
+      <div className="flex mb-5 justify-between">
+        <h2 className="text-lg font-semibold mb-4">Song Management</h2>
+        <button onClick={handleCreate} className=" rounded-md bg-black px-5 hover:bg-gray-700 text-white">Create new song</button>
+      </div>
+      <table className="min-w-full border-collapse border border-gray-300 relative">
         <thead>
           <tr className="bg-gray-100">
             <th className="border border-gray-300 px-4 py-2 text-left">
@@ -63,7 +124,7 @@ function TableSongs() {
         </thead>
         <tbody>
           {songs.length > 0 ? (
-            songs.map((song) => (
+            songs.map((song, index) => (
               <tr key={song.songID} className="hover:bg-gray-50">
                 <td className="border border-gray-300 px-4 py-2">
                   {song.songID}
@@ -82,10 +143,24 @@ function TableSongs() {
                   />
                 </td>
                 <td className="border border-gray-300 px-4 py-2 w-48">
-                  <audio controls className="w-full h-10 relative z-0">
+                  <audio 
+                    ref = {(el)=>(audioRefs.current[index] = el)}
+                    controls 
+                    className="w-full w-[300px] h-10 relative z-0"
+                    onPlay = {() => handlePlay(index)}
+                  >
                     <source src={song.audio} type="audio/mpeg" />
                     Your browser does not support the audio element.
                   </audio>
+                  {/* <audio
+                  ref={(el) => (audioRefs.current[index] = el)}
+                  controls
+                  onPlay={() => handlePlay(index)}
+                  className="w-full"
+                >
+                  <source src={song.audio} type="audio/mpeg" />
+                  Your browser does not support the audio element.
+                </audio> */}
                 </td>
                 <td className="border border-gray-300 px-4 py-2">
                   <button
