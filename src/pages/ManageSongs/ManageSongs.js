@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { addSong } from "../../services/songService";
 
-function ManageSongs() {
+function ManageSongs({ onClose }) {
   const [songName, setSongName] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
   const [audioPreview, setAudioPreview] = useState(null);
   const [imageFile, setImageFile] = useState(null);
   const [audioFile, setAudioFile] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
@@ -31,6 +32,8 @@ function ManageSongs() {
   };
 
   const handleAddSong = async () => {
+    setIsSubmitting(true);
+
     if (!songName) {
       alert("Please enter a song name.");
       return;
@@ -44,16 +47,23 @@ function ManageSongs() {
       return;
     }
 
-    await addSong({
-      songName,
-      image: imageFile,
-      audio: audioFile,
-    });
+    try {
+      await addSong({
+        songName,
+        image: imageFile,
+        audio: audioFile,
+      });
 
-    // setSongName("");
-    // setImagePreview(null);
-    // setAudioPreview(null);
-    // alert("Song added successfully!");
+      // setSongName("");
+      // setImagePreview(null);
+      // setAudioPreview(null);
+      // alert("Song added successfully!");
+      onClose();
+    } catch (err) {
+      alert("Failed to add song.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -96,9 +106,8 @@ function ManageSongs() {
               />
               <label
                 htmlFor="image_song"
-                className={`block cursor-pointer dropzone hover:border-brand-500! rounded-xl border border-dashed! border-gray-300! bg-gray-50 ${
-                  !imagePreview ? "p-7 lg:p-10" : ""
-                } dz-clickable`}
+                className={`block cursor-pointer dropzone hover:border-brand-500! rounded-xl border border-dashed! border-gray-300! bg-gray-50 ${!imagePreview ? "p-7 lg:p-10" : ""
+                  } dz-clickable`}
               >
                 {imagePreview ? (
                   <img
@@ -156,11 +165,10 @@ function ManageSongs() {
               />
               <label
                 htmlFor="song_audio"
-                className={`block cursor-pointer dropzone hover:border-brand-500! rounded-xl border border-dashed! border-gray-300! bg-gray-50 ${
-                  !audioPreview
+                className={`block cursor-pointer dropzone hover:border-brand-500! rounded-xl border border-dashed! border-gray-300! bg-gray-50 ${!audioPreview
                     ? "p-7 lg:p-10"
                     : "h-[267px] flex flex-col items-center justify-center"
-                } dz-clickable`}
+                  } dz-clickable`}
               >
                 {audioPreview ? (
                   <audio controls className="w-full ">
@@ -208,7 +216,7 @@ function ManageSongs() {
           onClick={handleAddSong}
           className="w-full rounded-lg bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
         >
-          Add New Song
+          {isSubmitting ? "Adding..." : "Add New Song"}
         </button>
       </div>
     </div>

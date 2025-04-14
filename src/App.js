@@ -20,7 +20,8 @@ export default function App() {
             {/* Others Page */}
             <Route path="/profile" element={<UserProfiles />} />
             <Route path="/manage-song" element={<ManageSongs />} />
-            <Route path="/manage-user" element={<TableSongs />} />
+            <Route path="/table-song" element={<TableSongs />} />
+            <Route path="/manage-user" element={<ManageUser />} />
           </Route>
 
           {/* Auth Layout */}
