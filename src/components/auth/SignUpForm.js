@@ -1,13 +1,67 @@
 import { useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { ChevronLeftIcon, EyeCloseIcon, EyeIcon } from "../../icons";
 import Label from "../form/Label";
 import Input from "../form/input/InputField";
 import Checkbox from "../form/input/Checkbox";
+import { registerWithEmailPassword } from "../../services/authService";
+import { sendEmailVerification } from "firebase/auth";
 
 export default function SignUpForm() {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSignUp = async (e) => {
+    e.preventDefault();
+    if (!email || !password) {
+      alert("Error please fill in all required fields.");
+      return;
+    }
+    if (password.length < 6) {
+      alert("Error Password must be at least 6 characters.");
+      return;
+    }
+    if (!isChecked) {
+      alert("Error You must agree to the Terms and Conditions.");
+      return;
+    }
+    try {
+      setIsLoading(true);
+      const user = await registerWithEmailPassword(email, password);
+      try {
+        await sendEmailVerification(user);
+      } catch (error) {
+        alert("Failed to send verification email: " + error.message);
+      }
+      alert(
+        "Success Account created successfully! Please check your email to verify your account."
+      );
+      navigate("/signin");
+    } catch (error) {
+      let message = "Sign up failed. Please try again.";
+      switch (error.code) {
+        case "auth/email-already-in-use":
+          message = "Email already in use.";
+          break;
+        case "auth/invalid-email":
+          message = "Invalid email address.";
+          break;
+        case "auth/weak-password":
+          message = "Password is too weak.";
+          break;
+        default:
+          message = error.message;
+      }
+      alert(`Error ${message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="flex flex-col flex-1 w-full overflow-y-auto lg:w-1/2 no-scrollbar">
       <div className="w-full max-w-md mx-auto mb-5 sm:pt-10">
@@ -90,32 +144,6 @@ export default function SignUpForm() {
             </div>
             <form>
               <div className="space-y-5">
-                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                  {/* <!-- First Name --> */}
-                  <div className="sm:col-span-1">
-                    <Label>
-                      First Name<span className="text-error-500">*</span>
-                    </Label>
-                    <Input
-                      type="text"
-                      id="fname"
-                      name="fname"
-                      placeholder="Enter your first name"
-                    />
-                  </div>
-                  {/* <!-- Last Name --> */}
-                  <div className="sm:col-span-1">
-                    <Label>
-                      Last Name<span className="text-error-500">*</span>
-                    </Label>
-                    <Input
-                      type="text"
-                      id="lname"
-                      name="lname"
-                      placeholder="Enter your last name"
-                    />
-                  </div>
-                </div>
                 {/* <!-- Email --> */}
                 <div>
                   <Label>
@@ -123,8 +151,8 @@ export default function SignUpForm() {
                   </Label>
                   <Input
                     type="email"
-                    id="email"
-                    name="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter your email"
                   />
                 </div>
@@ -136,6 +164,8 @@ export default function SignUpForm() {
                   <div className="relative">
                     <Input
                       placeholder="Enter your password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
                       type={showPassword ? "text" : "password"}
                     />
                     <span
@@ -170,7 +200,10 @@ export default function SignUpForm() {
                 </div>
                 {/* <!-- Button --> */}
                 <div>
-                  <button className="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition rounded-lg bg-brand-500 shadow-theme-xs hover:bg-brand-600">
+                  <button
+                    onClick={(e) => handleSignUp(e)}
+                    className="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition rounded-lg bg-brand-500 shadow-theme-xs hover:bg-brand-600"
+                  >
                     Sign Up
                   </button>
                 </div>

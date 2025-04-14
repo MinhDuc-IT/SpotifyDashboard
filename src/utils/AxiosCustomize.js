@@ -1,29 +1,24 @@
 import axios from "axios";
+import { auth } from "../firebase";
 
-// Lấy URL API từ file .env
-const API_URL =  "http://localhost:5063";
+const API_URL = "http://localhost:5000";
 
 // Tạo một instance của axios
 const axiosInstance = axios.create({
-  baseURL: API_URL, // URL gốc cho tất cả các request
-//   timeout: 10000, // Thời gian chờ tối đa (10 giây)
-//   headers: {
-//     "Content-Type": "application/json", // Định dạng dữ liệu gửi đi
-//   },
+  baseURL: process.env.REACT_APP_API_URL || API_URL,
 });
 
 // Thêm interceptor để xử lý request trước khi gửi
 axiosInstance.interceptors.request.use(
-  (config) => {
-    // Thêm token vào header nếu cần
-    const token = localStorage.getItem("token");
-    if (token) {
+  async (config) => {
+    const user = auth.currentUser;
+    if (user) {
+      const token = await user.getIdToken();
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
   (error) => {
-    // Xử lý lỗi trước khi request được gửi đi
     return Promise.reject(error);
   }
 );
