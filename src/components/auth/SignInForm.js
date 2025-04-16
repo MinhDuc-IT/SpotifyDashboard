@@ -5,10 +5,41 @@ import Label from "../form/Label";
 import Input from "../form/input/InputField";
 import Checkbox from "../form/input/Checkbox";
 import Button from "../ui/button/Button";
+import { loginWithEmailPassword } from "../../services/authService";
 
 export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSignIn = async (e) => {
+    e.preventDefault();
+    console.log("Sign In button clicked");
+    try {
+      const user = await loginWithEmailPassword(email, password);
+      await user.reload();
+
+      if (!user.emailVerified) {
+        await resendVerification(user);
+        alert(
+          "Email Not Verified. Please verify your email. A new verification link has been sent."
+        );
+        return;
+      }
+    } catch (err) {
+      alert("Đăng nhập thất bại: " + err.message);
+    }
+  };
+
+  const resendVerification = async (user) => {
+    try {
+      await user.sendEmailVerification();
+    } catch (error) {
+      alert("Failed to resend verification email: " + error.message);
+    }
+  };
+
   return (
     <div className="flex flex-col flex-1">
       <div className="w-full max-w-md pt-10 mx-auto">
@@ -95,7 +126,12 @@ export default function SignInForm() {
                   <Label>
                     Email <span className="text-error-500">*</span>{" "}
                   </Label>
-                  <Input placeholder="info@gmail.com" />
+                  <Input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="info@gmail.com"
+                  />
                 </div>
                 <div>
                   <Label>
@@ -104,6 +140,8 @@ export default function SignInForm() {
                   <div className="relative">
                     <Input
                       type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
                       placeholder="Enter your password"
                     />
                     <span
@@ -133,7 +171,11 @@ export default function SignInForm() {
                   </Link>
                 </div>
                 <div>
-                  <Button className="w-full" size="sm">
+                  <Button
+                    onClick={(e) => handleSignIn(e)}
+                    className="w-full"
+                    size="sm"
+                  >
                     Sign in
                   </Button>
                 </div>

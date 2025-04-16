@@ -18,14 +18,14 @@ const navItems = [
     name: "Dashboard",
     path: "/",
   },
+  // {
+  //   icon: <CalenderIcon />,
+  //   name: "Manage songs",
+  //   path: "/manage-song",
+  // },
   {
     icon: <CalenderIcon />,
-    name: "Manage songs",
-    path: "/manage-song",
-  },
-  {
-    icon: <CalenderIcon />,
-    name: "Table songs",
+    name: "Song Management",
     path: "/table-song",
   },
   {
@@ -41,14 +41,14 @@ const navItems = [
 ];
 
 const othersItems = [
-  {
-    icon: <PlugInIcon />,
-    name: "Authentication",
-    subItems: [
-      { name: "Sign In", path: "/signin", pro: false },
-      { name: "Sign Up", path: "/signup", pro: false },
-    ],
-  },
+  // {
+  //   icon: <PlugInIcon />,
+  //   name: "Authentication",
+  //   subItems: [
+  //     { name: "Sign In", path: "/signin", pro: false },
+  //     { name: "Sign Up", path: "/signup", pro: false },
+  //   ],
+  // },
 ];
 
 const AppSidebar = () => {
@@ -315,7 +315,8 @@ const AppSidebar = () => {
                 }`}
               >
                 {isExpanded || isHovered || isMobileOpen ? (
-                  "Others"
+                  // "Others"
+                  ""
                 ) : (
                   <HorizontaLDots />
                 )}

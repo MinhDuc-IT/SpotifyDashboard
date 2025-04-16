@@ -1,14 +1,50 @@
-import React, { useState } from "react";
-import { addSong } from "../../services/songService";
+import React, { useEffect, useState, useRef } from "react";
+import { addSong, updateSong } from "../../services/songService";
+import { RefreshCcw } from "lucide-react";
 
-function ManageSongs({ onClose }) {
+function ManageSongs({ onClose, song, fetchSongs, page, setIsLoading }) {
   const [songName, setSongName] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
   const [audioPreview, setAudioPreview] = useState(null);
   const [imageFile, setImageFile] = useState(null);
   const [audioFile, setAudioFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const audioRef = useRef(null);
 
+  useEffect(() => {
+    if (song) {
+      setSongName(song.songName || "");
+      setImagePreview(song.image || null);
+      setAudioPreview(song.audio || null);
+    } else {
+      setSongName("");
+      setImagePreview(null);
+      setAudioPreview(null);
+      setImageFile(null);
+      setAudioFile(null);
+    }
+  }, [song]);
+
+  useEffect(() => {
+    if (audioRef.current && audioPreview) {
+      audioRef.current.load();
+
+      // Nếu bạn vẫn muốn làm gì đó sau khi audio load xong (vd: hiển thị thời lượng)
+      const handleLoaded = () => {
+        console.log("Audio đã load xong, sẵn sàng để phát");
+        // Không gọi play ở đây
+      };
+  
+      audioRef.current.addEventListener("loadeddata", handleLoaded);
+  
+      return () => {
+        if (audioRef.current) {
+          audioRef.current.removeEventListener("loadeddata", handleLoaded);
+        }
+      };
+    }
+  }, [audioPreview]);
+  
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
     setImageFile(file);
@@ -32,7 +68,9 @@ function ManageSongs({ onClose }) {
   };
 
   const handleAddSong = async () => {
+    if (isSubmitting) return;
     setIsSubmitting(true);
+    setIsLoading(true);
 
     if (!songName) {
       alert("Please enter a song name.");
@@ -47,22 +85,38 @@ function ManageSongs({ onClose }) {
       return;
     }
 
-    try {
-      await addSong({
-        songName,
-        image: imageFile,
-        audio: audioFile,
-      });
-
-      // setSongName("");
-      // setImagePreview(null);
-      // setAudioPreview(null);
-      // alert("Song added successfully!");
-      onClose();
-    } catch (err) {
-      alert("Failed to add song.");
-    } finally {
-      setIsSubmitting(false);
+    if (!song) {
+      try {
+        await addSong({
+          songName,
+          image: imageFile,
+          audio: audioFile,
+        });
+        fetchSongs(page);
+        onClose();
+      } catch (err) {
+        console.error("Error adding song:", err);
+        alert("Failed to add song.");
+      } finally {
+        setIsSubmitting(false);
+      }
+    } else {
+      try {
+        await updateSong({
+          id: song.songID,
+          songName,
+          image: imageFile,
+          audio: audioFile,
+        });
+        fetchSongs(page);
+        onClose();
+      } catch (err) {
+        console.error("Error updating song:", err);
+        alert("Failed to update song.");
+      } finally {
+        setIsSubmitting(false);
+        setIsLoading(false);
+      }
     }
   };
 
@@ -106,8 +160,9 @@ function ManageSongs({ onClose }) {
               />
               <label
                 htmlFor="image_song"
-                className={`block cursor-pointer dropzone hover:border-brand-500! rounded-xl border border-dashed! border-gray-300! bg-gray-50 ${!imagePreview ? "p-7 lg:p-10" : ""
-                  } dz-clickable`}
+                className={`block cursor-pointer dropzone hover:border-brand-500! rounded-xl border border-dashed! border-gray-300! bg-gray-50 ${
+                  !imagePreview ? "p-7 lg:p-10" : ""
+                } dz-clickable`}
               >
                 {imagePreview ? (
                   <img
@@ -165,13 +220,14 @@ function ManageSongs({ onClose }) {
               />
               <label
                 htmlFor="song_audio"
-                className={`block cursor-pointer dropzone hover:border-brand-500! rounded-xl border border-dashed! border-gray-300! bg-gray-50 ${!audioPreview
+                className={`block cursor-pointer dropzone hover:border-brand-500! rounded-xl border border-dashed! border-gray-300! bg-gray-50 ${
+                  !audioPreview
                     ? "p-7 lg:p-10"
                     : "h-[267px] flex flex-col items-center justify-center"
-                  } dz-clickable`}
+                } dz-clickable`}
               >
                 {audioPreview ? (
-                  <audio controls className="w-full ">
+                  <audio ref={audioRef} controls className="w-full ">
                     <source src={audioPreview} type="audio/mpeg" />
                     Your browser does not support the audio element.
                   </audio>
@@ -214,9 +270,14 @@ function ManageSongs({ onClose }) {
       <div className="px-5 py-4 sm:px-6 sm:py-5">
         <button
           onClick={handleAddSong}
-          className="w-full rounded-lg bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+          className="flex justify-center items-center w-full rounded-lg bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
         >
-          {isSubmitting ? "Adding..." : "Add New Song"}
+          {song ? "Save Song" : "Add New Song"}
+          <span>
+            {isSubmitting && (
+              <RefreshCcw className={`w-4 mt-[3px] h-4 ml-1 animate-spin`} />
+            )}
+          </span>
         </button>
       </div>
     </div>

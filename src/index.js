@@ -5,14 +5,17 @@ import { HelmetProvider } from "react-helmet-async";
 import "./index.css";
 import App from "./App";
 import { ThemeProvider } from "./context/ThemeContext";
+import { AuthProvider } from "./context/AuthContext";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     <ThemeProvider>
-      <HelmetProvider>
-        <App />
-      </HelmetProvider>
+      <AuthProvider>
+        <HelmetProvider>
+          <App />
+        </HelmetProvider>
+      </AuthProvider>
     </ThemeProvider>
   </React.StrictMode>
 );
