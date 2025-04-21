@@ -6,6 +6,7 @@ import Input from "../form/input/InputField";
 import Checkbox from "../form/input/Checkbox";
 import { registerWithEmailPassword } from "../../services/authService";
 import { sendEmailVerification } from "firebase/auth";
+import { RefreshCcw } from "lucide-react";
 
 export default function SignUpForm() {
   const navigate = useNavigate();
@@ -30,6 +31,7 @@ export default function SignUpForm() {
       return;
     }
     try {
+      if (isLoading) return;
       setIsLoading(true);
       const user = await registerWithEmailPassword(email, password);
       try {
@@ -56,6 +58,7 @@ export default function SignUpForm() {
         default:
           message = error.message;
       }
+      setIsLoading(false);
       alert(`Error ${message}`);
     } finally {
       setIsLoading(false);
@@ -204,7 +207,7 @@ export default function SignUpForm() {
                     onClick={(e) => handleSignUp(e)}
                     className="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition rounded-lg bg-brand-500 shadow-theme-xs hover:bg-brand-600"
                   >
-                    Sign Up
+                    {isLoading ? <RefreshCcw className="animate-spin" /> : 'Sign Up'}
                   </button>
                 </div>
               </div>

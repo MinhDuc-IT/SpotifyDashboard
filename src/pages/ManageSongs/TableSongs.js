@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { getAllSongs, deleteSong } from "../../services/songService";
 import ManageSongs from "./ManageSongs";
+import { FaSearch } from "react-icons/fa";
 
 function TableSongs() {
   const [songs, setSongs] = useState([]);
@@ -9,6 +10,7 @@ function TableSongs() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const audioRefs = useRef([]);
   const LIMIT = 1;
 
@@ -100,13 +102,23 @@ function TableSongs() {
         </div>
       )}
 
-      <div className="flex mb-5 justify-between">
-        <h2 className="text-lg font-semibold mb-4">Song Management</h2>
+       {/* Search and Add Button */}
+       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-3">
+        <div className="relative flex-1">
+          <input
+            type="text"
+            placeholder="Search by email or name..."
+            className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <FaSearch className="absolute left-3 top-3 text-gray-400" />
+        </div>
         <button
-          onClick={handleCreate}
-          className=" rounded-md bg-black px-5 hover:bg-gray-700 text-white"
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors w-full md:w-auto"
+          onClick={() => handleCreate(true)}
         >
-          Create new song
+          Add Song
         </button>
       </div>
       <table className="min-w-full border-collapse border border-gray-300 relative">
