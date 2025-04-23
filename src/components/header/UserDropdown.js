@@ -6,7 +6,6 @@ import { useAuth } from "../../hooks/useAuth";
 export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const { user, logout } = useAuth();
-  console.log(user);
 
   function toggleDropdown() {
     setIsOpen(!isOpen);

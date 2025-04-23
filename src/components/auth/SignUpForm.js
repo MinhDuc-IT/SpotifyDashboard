@@ -190,7 +190,7 @@ export default function SignUpForm() {
                     checked={isChecked}
                     onChange={setIsChecked}
                   />
-                  <p className="inline-block font-normal text-gray-500 dark:text-gray-400">
+                  <p className="inline-block font-normal text-[14px] text-gray-500 dark:text-gray-400">
                     By creating an account means you agree to the{" "}
                     <span className="text-gray-800 dark:text-white/90">
                       Terms and Conditions,

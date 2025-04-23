@@ -8,8 +8,8 @@ export const AuthProvider = ({ children }) => {
   const [role, setRole] = useState(null);
 
   const login = (userData, userRole) => {
-    console.log("User data:", userData);
-    console.log("User role:", userRole);
+    // console.log("User data:", userData);
+    // console.log("User role:", userRole);
     setUser(userData);
     setRole(userRole);
   };

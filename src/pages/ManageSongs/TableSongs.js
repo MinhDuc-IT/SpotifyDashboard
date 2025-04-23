@@ -5,7 +5,7 @@ import { FaSearch } from "react-icons/fa";
 
 function TableSongs() {
   const [songs, setSongs] = useState([]);
-  const [songEdit, setSongEdit] = useState({});
+  const [songEdit, setSongEdit] = useState(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
