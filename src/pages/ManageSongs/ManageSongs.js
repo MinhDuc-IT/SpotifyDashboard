@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { addSong, updateSong } from "../../services/songService";
 import { RefreshCcw } from "lucide-react";
+import { useAuth } from "../../hooks/useAuth";
 
 function ManageSongs({ onClose, song, fetchSongs, page, setIsLoading }) {
   const [songName, setSongName] = useState("");
@@ -9,6 +10,7 @@ function ManageSongs({ onClose, song, fetchSongs, page, setIsLoading }) {
   const [imageFile, setImageFile] = useState(null);
   const [audioFile, setAudioFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { user } = useAuth();
   const audioRef = useRef(null);
 
   useEffect(() => {
@@ -95,6 +97,7 @@ function ManageSongs({ onClose, song, fetchSongs, page, setIsLoading }) {
         fetchSongs(page);
         onClose();
       } catch (err) {
+        setIsSubmitting(false);
         console.error("Error adding song:", err);
         alert("Failed to add song.");
       } finally {

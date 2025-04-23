@@ -246,6 +246,10 @@ layer(base);
     border-color: var(--color-brand-500);
   }
 
+  .bg-success-500 {
+    background-color: var(--color-success-500);
+  }
+
   /* Scrollbar utilities */
   .no-scrollbar::-webkit-scrollbar {
     display: none;
@@ -272,6 +276,20 @@ layer(base);
 
   .dark .custom-scrollbar::-webkit-scrollbar-thumb {
     background-color: #344054;
+  }
+
+  .custom-scrollbar {
+    &::-webkit-scrollbar {
+      width: calc(var(--spacing) * 1.5);
+      height: calc(var(--spacing) * 1.5);
+    }
+    &::-webkit-scrollbar-track {
+      border-radius: calc(infinity * 1px);
+    }
+    &::-webkit-scrollbar-thumb {
+      border-radius: calc(infinity * 1px);
+      background-color: var(--color-gray-200);
+    }
   }
 
   /* Menu item utilities */
@@ -577,6 +595,9 @@ span.flatpickr-weekday,
 .fc-addEventButton-button {
   @apply rounded-lg border-0 bg-brand-500 px-4 py-2.5 text-sm font-medium  focus:shadow-none;
 }
+.event-fc-color.fc-bg-success .fc-daygrid-event-dot {
+  @apply bg-success-500;
+}
 /*.fc-toolbar-title {
   @apply text-lg! font-medium! text-gray-800 dark:text-white/90;
 }
@@ -649,9 +670,7 @@ span.flatpickr-weekday,
 .event-fc-color.fc-bg-warning {
   @apply border-orange-50 bg-orange-50;
 }
-.event-fc-color.fc-bg-success .fc-daygrid-event-dot {
-  @apply bg-success-500;
-}
+
 .event-fc-color.fc-bg-danger .fc-daygrid-event-dot {
   @apply bg-error-500;
 }

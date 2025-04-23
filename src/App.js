@@ -15,22 +15,23 @@ import { auth } from "./firebase";
 import { setCustomClaims } from "./services/authService";
 import axios from "./utils/AxiosCustomize";
 import { FaSpinner } from "react-icons/fa";
+import { connectToNotificationHub } from "./services/notificationHub";
 
 export default function App() {
   const [loading, setLoading] = useState(true);
   const { user, login, logout } = useAuth();
 
   const handleAuthStateChanged = async (user) => {
-    console.log("[Auth] User state changed:", user ? user.email : "null");
-    console.log("[Auth] User state changed:", user);
+    // console.log("[Auth] User state changed:", user ? user.email : "null");
+    // console.log("[Auth] User state changed:", user);
     if (user) {
       const providerId = user.providerData[0]?.providerId;
-      console.log("[Auth] Provider ID:", providerId);
+      // console.log("[Auth] Provider ID:", providerId);
 
       // Kiểm tra email đã xác minh hoặc đăng nhập qua Facebook
       if (user.emailVerified || providerId === "facebook.com") {
         try {
-          console.log("[Auth] User is verified or Facebook login");
+          // console.log("[Auth] User is verified or Facebook login");
           const tokenResult = await user.getIdTokenResult(true);
 
           // Gửi token đến server để thiết lập custom claims
@@ -44,7 +45,7 @@ export default function App() {
 
           // Xác định roles dựa trên claim 'roles'
           login(user, updatedTokenResult.claims.roles || []);
-          console.log("Login called with user:", user);
+          // console.log("Login called with user:", user);
 
           // // Cập nhật header API
           axios.defaults.headers.common[
@@ -53,6 +54,12 @@ export default function App() {
           if (user) {
             <Navigate to="/" replace />;
           }
+          console.log("[Auth] User roles:", user.accessToken);
+          // ✅ Gọi connectToNotificationHub sau khi đăng nhập thành công
+          connectToNotificationHub((data) => {
+            console.log("📢 Received notification:", data);
+            // TODO: hiển thị toast / update UI tại đây
+          }, user.accessToken);
         } catch (error) {
           console.error("Token refresh error:", error);
         }

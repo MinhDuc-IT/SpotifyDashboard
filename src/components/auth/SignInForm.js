@@ -6,37 +6,35 @@ import Input from "../form/input/InputField";
 import Checkbox from "../form/input/Checkbox";
 import Button from "../ui/button/Button";
 import { loginWithEmailPassword } from "../../services/authService";
+import { RefreshCcw } from "lucide-react";
+import { sendEmailVerification } from "firebase/auth";
 
 export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSignIn = async (e) => {
+    if (loading) return;
+    setLoading(true);
     e.preventDefault();
-    console.log("Sign In button clicked");
     try {
       const user = await loginWithEmailPassword(email, password);
       await user.reload();
 
       if (!user.emailVerified) {
-        await resendVerification(user);
+        await sendEmailVerification(user);
         alert(
           "Email Not Verified. Please verify your email. A new verification link has been sent."
         );
+        setLoading(false);
         return;
       }
     } catch (err) {
+      setLoading(false);
       alert("Đăng nhập thất bại: " + err.message);
-    }
-  };
-
-  const resendVerification = async (user) => {
-    try {
-      await user.sendEmailVerification();
-    } catch (error) {
-      alert("Failed to resend verification email: " + error.message);
     }
   };
 
@@ -176,7 +174,7 @@ export default function SignInForm() {
                     className="w-full"
                     size="sm"
                   >
-                    Sign in
+                    {loading ? <RefreshCcw className="animate-spin" /> : "Sign in"}
                   </Button>
                 </div>
               </div>
